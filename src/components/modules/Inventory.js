@@ -540,157 +540,213 @@ export default function Inventory() {
       {/* Add/Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-              <form onSubmit={handleSubmit}>
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-medium text-gray-900">
-                      {isEditing ? 'Edit Item' : 'Add New Item'}
-                    </h3>
-                    <button type="button" onClick={closeModal} className="text-gray-400 hover:text-gray-500">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={closeModal}></div>
+            <div className="relative bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all max-w-3xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <form onSubmit={handleSubmit} className="divide-y divide-gray-100">
+                <div className="px-8 pt-8 pb-6">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900">
+                        {isEditing ? 'Edit Item' : 'Add New Item'}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {isEditing ? 'Update inventory item details' : 'Add a new item to your inventory'}
+                      </p>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={closeModal} 
+                      className="rounded-full p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                    >
                       <XMarkIcon className="h-6 w-6" />
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+                  <div className="space-y-8">
+                    {/* Basic Information */}
+                    <div className="space-y-6">
+                      <h4 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                        Basic Information
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">SKU *</label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.sku}
+                            onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                            className="block w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Enter SKU code"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">Category</label>
+                          <select
+                            value={formData.category}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                            className="block w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          >
+                            <option value="">Select category</option>
+                            {categories.slice(1).map(category => (
+                              <option key={category} value={category}>{category}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-semibold text-gray-700">Item Name *</label>
                       <input
                         type="text"
                         required
-                        value={formData.sku}
-                        onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="block w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        placeholder="Enter item name"
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                      <select
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {categories.slice(1).map(category => (
-                          <option key={category} value={category}>{category}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
 
-                  <div className="mt-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
+                    {/* Stock Information */}
+                    <div className="space-y-6">
+                      <h4 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                        Stock Management
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">Current Stock *</label>
+                          <input
+                            type="number"
+                            min="0"
+                            required
+                            value={formData.currentStock}
+                            onChange={(e) => setFormData({ ...formData, currentStock: parseInt(e.target.value) || 0 })}
+                            className="block w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">Minimum Stock *</label>
+                          <input
+                            type="number"
+                            min="0"
+                            required
+                            value={formData.minimumStock}
+                            onChange={(e) => setFormData({ ...formData, minimumStock: parseInt(e.target.value) || 0 })}
+                            className="block w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">Maximum Stock *</label>
+                          <input
+                            type="number"
+                            min="0"
+                            required
+                            value={formData.maximumStock}
+                            onChange={(e) => setFormData({ ...formData, maximumStock: parseInt(e.target.value) || 0 })}
+                            className="block w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="mt-6 grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Current Stock</label>
-                      <input
-                        type="number"
-                        min="0"
-                        required
-                        value={formData.currentStock}
-                        onChange={(e) => setFormData({ ...formData, currentStock: parseInt(e.target.value) || 0 })}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
+                    {/* Pricing Information */}
+                    <div className="space-y-6">
+                      <h4 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                        Pricing & Costs
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">Unit Cost *</label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              required
+                              value={formData.unitCost}
+                              onChange={(e) => setFormData({ ...formData, unitCost: parseFloat(e.target.value) || 0 })}
+                              className="block w-full border border-gray-300 rounded-lg pl-8 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                              placeholder="0.00"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">Selling Price *</label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              required
+                              value={formData.sellingPrice}
+                              onChange={(e) => setFormData({ ...formData, sellingPrice: parseFloat(e.target.value) || 0 })}
+                              className="block w-full border border-gray-300 rounded-lg pl-8 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                              placeholder="0.00"
+                            />
+                          </div>
+                          {formData.unitCost > 0 && formData.sellingPrice > 0 && (
+                            <p className="text-xs text-gray-600">
+                              Margin: ${(formData.sellingPrice - formData.unitCost).toFixed(2)} 
+                              ({(((formData.sellingPrice - formData.unitCost) / formData.sellingPrice) * 100).toFixed(1)}%)
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Minimum Stock</label>
-                      <input
-                        type="number"
-                        min="0"
-                        required
-                        value={formData.minimumStock}
-                        onChange={(e) => setFormData({ ...formData, minimumStock: parseInt(e.target.value) || 0 })}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Maximum Stock</label>
-                      <input
-                        type="number"
-                        min="0"
-                        required
-                        value={formData.maximumStock}
-                        onChange={(e) => setFormData({ ...formData, maximumStock: parseInt(e.target.value) || 0 })}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
 
-                  <div className="mt-6 grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Unit Cost</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        required
-                        value={formData.unitCost}
-                        onChange={(e) => setFormData({ ...formData, unitCost: parseFloat(e.target.value) || 0 })}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Selling Price</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        required
-                        value={formData.sellingPrice}
-                        onChange={(e) => setFormData({ ...formData, sellingPrice: parseFloat(e.target.value) || 0 })}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-6 grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Vendor</label>
-                      <select
-                        value={formData.vendor}
-                        onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="">Select vendor</option>
-                        {vendors.map(vendor => (
-                          <option key={vendor} value={vendor}>{vendor}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                      <input
-                        type="text"
-                        value={formData.location}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
+                    {/* Additional Information */}
+                    <div className="space-y-6">
+                      <h4 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                        Additional Details
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">Vendor</label>
+                          <select
+                            value={formData.vendor}
+                            onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
+                            className="block w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          >
+                            <option value="">Select vendor</option>
+                            {vendors.map(vendor => (
+                              <option key={vendor} value={vendor}>{vendor}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block text-sm font-semibold text-gray-700">Storage Location</label>
+                          <input
+                            type="text"
+                            value={formData.location}
+                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                            className="block w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="e.g., Warehouse A, Shelf 1"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="submit"
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  >
-                    {isEditing ? 'Update' : 'Create'}
-                  </button>
+                <div className="bg-gray-50 px-8 py-6 flex justify-end space-x-4">
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="px-6 py-3 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all"
                   >
                     Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all"
+                  >
+                    {isEditing ? 'Update Item' : 'Create Item'}
                   </button>
                 </div>
               </form>
