@@ -11,6 +11,7 @@ import {
   MapPinIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+import CustomerDetail from '../details/CustomerDetail';
 
 const mockCustomers = [
   {
@@ -78,6 +79,7 @@ export default function Customers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -114,10 +116,26 @@ export default function Customers() {
     setIsModalOpen(true);
   };
 
+  const openCustomerDetail = (customer) => {
+    setSelectedCustomer(customer);
+    setShowDetail(true);
+  };
+
+  const closeCustomerDetail = () => {
+    setShowDetail(false);
+    setSelectedCustomer(null);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedCustomer(null);
     setIsEditing(false);
+  };
+
+  const handleCustomerUpdate = (updatedCustomer) => {
+    setCustomers(customers.map(customer => 
+      customer.id === updatedCustomer.id ? updatedCustomer : customer
+    ));
   };
 
   const handleSubmit = (e) => {
@@ -142,10 +160,21 @@ export default function Customers() {
   };
 
   const handleDelete = (customerId) => {
-    if (window.confirm('Are you sure you want to delete this customer?')) {
+    if (confirm('Are you sure you want to delete this customer?')) {
       setCustomers(customers.filter(customer => customer.id !== customerId));
     }
   };
+
+  // Show detail view if a customer is selected
+  if (showDetail && selectedCustomer) {
+    return (
+      <CustomerDetail 
+        customer={selectedCustomer} 
+        onBack={closeCustomerDetail}
+        onUpdate={handleCustomerUpdate}
+      />
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -227,7 +256,10 @@ export default function Customers() {
               <tr key={customer.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
-                    <div className="text-sm font-medium text-gray-900">
+                    <div 
+                      className="text-sm font-medium text-gray-900 cursor-pointer hover:text-blue-600"
+                      onClick={() => openCustomerDetail(customer)}
+                    >
                       {customer.name}
                     </div>
                     <div className="text-sm text-gray-500 flex items-center mt-1">

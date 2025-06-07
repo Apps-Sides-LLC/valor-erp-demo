@@ -15,7 +15,8 @@ import {
   ClockIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
+import InvoiceDetail from '../details/InvoiceDetail';
 
 const mockInvoices = [
   {
@@ -205,7 +206,7 @@ export default function Invoices() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     customerId: "",
@@ -286,16 +287,26 @@ export default function Invoices() {
     setIsModalOpen(true);
   };
 
-  const openViewModal = (invoice) => {
+  const openInvoiceDetail = (invoice) => {
     setSelectedInvoice(invoice);
-    setIsViewModalOpen(true);
+    setShowDetail(true);
+  };
+
+  const closeInvoiceDetail = () => {
+    setShowDetail(false);
+    setSelectedInvoice(null);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setIsViewModalOpen(false);
     setSelectedInvoice(null);
     setIsEditing(false);
+  };
+
+  const handleInvoiceUpdate = (updatedInvoice) => {
+    setInvoices(invoices.map(invoice => 
+      invoice.id === updatedInvoice.id ? updatedInvoice : invoice
+    ));
   };
 
   const addItem = () => {
@@ -396,6 +407,17 @@ export default function Invoices() {
       setInvoices(invoices.filter((invoice) => invoice.id !== invoiceId));
     }
   };
+
+  // Show detail view if an invoice is selected
+  if (showDetail && selectedInvoice) {
+    return (
+      <InvoiceDetail 
+        invoice={selectedInvoice} 
+        onBack={closeInvoiceDetail}
+        onUpdate={handleInvoiceUpdate}
+      />
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -531,10 +553,18 @@ export default function Invoices() {
               <tr key={invoice.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
-                    <div className="text-sm font-medium text-gray-900">
+                    <div 
+                      className="text-sm font-medium text-gray-900 cursor-pointer hover:text-blue-600"
+                      onClick={() => openInvoiceDetail(invoice)}
+                    >
                       {invoice.id}
                     </div>
-                    <div className="text-sm text-gray-500">{invoice.title}</div>
+                    <div 
+                      className="text-sm text-gray-500 cursor-pointer hover:text-blue-600"
+                      onClick={() => openInvoiceDetail(invoice)}
+                    >
+                      {invoice.title}
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -568,7 +598,7 @@ export default function Invoices() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => openViewModal(invoice)}
+                      onClick={() => openInvoiceDetail(invoice)}
                       className="text-gray-600 hover:text-gray-900"
                       title="View"
                     >
@@ -922,123 +952,7 @@ export default function Invoices() {
         </div>
       )}
 
-      {/* View Modal */}
-      {isViewModalOpen && selectedInvoice && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Invoice Preview
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className="text-gray-400 hover:text-gray-500"
-                  >
-                    <XMarkIcon className="h-6 w-6" />
-                  </button>
-                </div>
-                <div className="bg-white p-8 border border-gray-200 rounded-lg">
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      {selectedInvoice.id}
-                    </h2>
-                    <h3 className="text-xl text-gray-700">
-                      {selectedInvoice.title}
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-8 mb-8">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">
-                        Bill To:
-                      </h4>
-                      <p className="text-gray-700">
-                        {selectedInvoice.customerName}
-                      </p>
-                      <p className="text-gray-600">
-                        {selectedInvoice.customerEmail}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">
-                        Invoice Details:
-                      </h4>
-                      <p className="text-gray-700">
-                        Issue Date: {selectedInvoice.issueDate}
-                      </p>
-                      <p className="text-gray-700">
-                        Due Date: {selectedInvoice.dueDate}
-                      </p>
-                      {selectedInvoice.jobId && (
-                        <p className="text-gray-700">
-                          Job: {selectedInvoice.jobId}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <table className="w-full mb-8">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-2">Description</th>
-                        <th className="text-right py-2">Qty</th>
-                        <th className="text-right py-2">Price</th>
-                        <th className="text-right py-2">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedInvoice.items.map((item) => (
-                        <tr key={item.id} className="border-b border-gray-100">
-                          <td className="py-2">{item.description}</td>
-                          <td className="text-right py-2">{item.quantity}</td>
-                          <td className="text-right py-2">
-                            ${item.unitPrice.toFixed(2)}
-                          </td>
-                          <td className="text-right py-2">
-                            ${item.total.toFixed(2)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <div className="flex justify-end">
-                    <div className="w-64">
-                      <div className="flex justify-between mb-2">
-                        <span>Subtotal:</span>
-                        <span>${selectedInvoice.subtotal.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between mb-2">
-                        <span>Tax ({selectedInvoice.taxRate}%):</span>
-                        <span>${selectedInvoice.taxAmount.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-2">
-                        <span>Total:</span>
-                        <span>${selectedInvoice.total.toFixed(2)}</span>
-                      </div>
-                      {selectedInvoice.amountDue > 0 && (
-                        <div className="flex justify-between text-lg font-bold text-red-600 mt-2">
-                          <span>Amount Due:</span>
-                          <span>${selectedInvoice.amountDue.toFixed(2)}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {selectedInvoice.notes && (
-                    <div className="mt-8">
-                      <h4 className="font-semibold text-gray-900 mb-2">
-                        Notes:
-                      </h4>
-                      <p className="text-gray-700">{selectedInvoice.notes}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

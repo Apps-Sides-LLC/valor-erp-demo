@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Bars3Icon,
@@ -17,7 +17,7 @@ import {
   ClockIcon,
   CreditCardIcon,
   HomeIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
 import {
   Dialog,
   DialogBackdrop,
@@ -26,29 +26,29 @@ import {
   MenuButton,
   MenuItem,
   MenuItems,
-} from '@headlessui/react';
-import { useUI } from '@/context/ui-context';
+} from "@headlessui/react";
+import { useUI } from "@/context/ui-context";
 
 const navigation = [
-  { name: 'Dashboard', icon: HomeIcon, href: '/dashboard' },
-  { name: 'Customers', icon: UsersIcon, href: '/customers' },
-  { name: 'Estimates', icon: DocumentTextIcon, href: '/estimates' },
-  { name: 'Jobs', icon: BriefcaseIcon, href: '/jobs' },
-  { name: 'Time & Attendance', icon: ClockIcon, href: '/time' },
-  { name: 'Inventory', icon: CubeIcon, href: '/inventory' },
-  { name: 'Invoices', icon: CreditCardIcon, href: '/invoices' },
-  { name: 'Vendors', icon: TruckIcon, href: '/vendors' },
-  { name: 'Reports', icon: ChartBarIcon, href: '/reports' },
+  { name: "Dashboard", icon: HomeIcon, href: "/dashboard" },
+  { name: "Customers", icon: UsersIcon, href: "/customers" },
+  { name: "Estimates", icon: DocumentTextIcon, href: "/estimates" },
+  { name: "Jobs", icon: BriefcaseIcon, href: "/jobs" },
+  { name: "Time & Attendance", icon: ClockIcon, href: "/time" },
+  { name: "Inventory", icon: CubeIcon, href: "/inventory" },
+  { name: "Invoices", icon: CreditCardIcon, href: "/invoices" },
+  { name: "Vendors", icon: TruckIcon, href: "/vendors" },
+  { name: "Reports", icon: ChartBarIcon, href: "/reports" },
 ];
 
 const userNavigation = [
-  { name: 'Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: "Profile", href: "#" },
+  { name: "Settings", href: "#" },
+  { name: "Sign out", href: "#" },
 ];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 function SidebarContent() {
@@ -60,14 +60,14 @@ function SidebarContent() {
       <div className="flex h-16 shrink-0 items-center px-6">
         <div className="flex items-center">
           <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <span className="text-white font-bold text-lg">E</span>
+            <span className="text-white font-bold text-lg">V</span>
           </div>
-          <span className="ml-3 text-xl font-bold text-white">ERP Pro</span>
+          <span className="ml-3 text-xl font-bold text-white">Valor ERP</span>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-1 flex-col px-4 pb-4">
+      <nav className="flex flex-1 flex-col px-4 pb-4 pt-4">
         <ul className="flex flex-1 flex-col gap-y-1">
           {navigation.map((item) => (
             <li key={item.name}>
@@ -75,17 +75,17 @@ function SidebarContent() {
                 onClick={() => setActiveSection(item.name)}
                 className={classNames(
                   activeSection === item.name
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700',
-                  'group flex gap-x-3 rounded-lg p-3 text-sm font-semibold leading-6 transition-all duration-200 sidebar-item w-full text-left'
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-300 hover:text-white hover:bg-gray-700",
+                  "group flex gap-x-3 rounded-lg p-3 text-sm font-semibold leading-6 transition-all duration-200 sidebar-item w-full text-left",
                 )}
               >
                 <item.icon
                   className={classNames(
                     activeSection === item.name
-                      ? 'text-white'
-                      : 'text-gray-400 group-hover:text-white',
-                    'h-5 w-5 shrink-0'
+                      ? "text-white"
+                      : "text-gray-400 group-hover:text-white",
+                    "h-5 w-5 shrink-0",
                   )}
                   aria-hidden="true"
                 />
@@ -101,9 +101,13 @@ function SidebarContent() {
             <div className="rounded-lg bg-gray-800 p-3">
               <div className="flex items-center">
                 <div className="h-2 w-2 rounded-full bg-green-400"></div>
-                <span className="ml-2 text-xs text-gray-300">System Online</span>
+                <span className="ml-2 text-xs text-gray-300">
+                  System Online
+                </span>
               </div>
-              <div className="mt-1 text-xs text-gray-400">All services operational</div>
+              <div className="mt-1 text-xs text-gray-400">
+                All services operational
+              </div>
             </div>
           </div>
         </div>
@@ -118,7 +122,11 @@ export default function Shell({ children }) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile menu */}
-      <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="relative z-50 lg:hidden">
+      <Dialog
+        open={mobileMenuOpen}
+        onClose={setMobileMenuOpen}
+        className="relative z-50 lg:hidden"
+      >
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-gray-900/80 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
@@ -203,7 +211,10 @@ export default function Shell({ children }) {
               </button>
 
               {/* Separator */}
-              <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" aria-hidden="true" />
+              <div
+                className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200"
+                aria-hidden="true"
+              />
 
               {/* Profile dropdown */}
               <Menu as="div" className="relative">
@@ -214,7 +225,10 @@ export default function Shell({ children }) {
                     <span className="ml-2 text-sm font-semibold leading-6 text-gray-900">
                       John Doe
                     </span>
-                    <ChevronDownIcon className="ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <ChevronDownIcon
+                      className="ml-2 h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
                   </span>
                 </MenuButton>
                 <MenuItems
@@ -239,9 +253,7 @@ export default function Shell({ children }) {
 
         {/* Page content */}
         <main className="flex-1">
-          <div className="px-4 py-6 sm:px-6 lg:px-8">
-            {children}
-          </div>
+          <div className="px-4 py-6 sm:px-6 lg:px-8">{children}</div>
         </main>
       </div>
     </div>

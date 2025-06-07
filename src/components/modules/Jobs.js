@@ -16,6 +16,7 @@ import {
   PlayIcon,
   PauseIcon,
 } from '@heroicons/react/24/outline';
+import JobDetail from '../details/JobDetail';
 
 const mockJobs = [
   {
@@ -133,8 +134,7 @@ export default function Jobs() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedJob, setSelectedJob] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -144,20 +144,20 @@ export default function Jobs() {
     return matchesSearch && matchesStatus;
   });
 
-  const openJobModal = (job) => {
+  const openJobDetail = (job) => {
     setSelectedJob(job);
-    setIsModalOpen(true);
+    setShowDetail(true);
   };
 
-  const openInventoryModal = (job) => {
-    setSelectedJob(job);
-    setIsInventoryModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setIsInventoryModalOpen(false);
+  const closeJobDetail = () => {
+    setShowDetail(false);
     setSelectedJob(null);
+  };
+
+  const handleJobUpdate = (updatedJob) => {
+    setJobs(jobs.map(job => 
+      job.id === updatedJob.id ? updatedJob : job
+    ));
   };
 
   const updateJobStatus = (jobId, newStatus) => {
@@ -209,6 +209,17 @@ export default function Jobs() {
     const currentIndex = statusFlow.indexOf(currentStatus);
     return currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : null;
   };
+
+  // Show detail view if a job is selected
+  if (showDetail && selectedJob) {
+    return (
+      <JobDetail 
+        job={selectedJob} 
+        onBack={closeJobDetail}
+        onUpdate={handleJobUpdate}
+      />
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -317,7 +328,12 @@ export default function Jobs() {
           <div key={job.id} className="bg-white rounded-xl shadow-sm ring-1 ring-gray-900/5 p-6">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
+                <h3 
+                  className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600"
+                  onClick={() => openJobDetail(job)}
+                >
+                  {job.title}
+                </h3>
                 <p className="text-sm text-gray-600">{job.id} • {job.customerName}</p>
               </div>
               <div className="flex items-center space-x-2">
@@ -371,17 +387,16 @@ export default function Jobs() {
             <div className="flex items-center justify-between pt-4 border-t border-gray-200">
               <div className="flex space-x-2">
                 <button
-                  onClick={() => openJobModal(job)}
+                  onClick={() => openJobDetail(job)}
                   className="text-blue-600 hover:text-blue-900 text-sm font-medium"
                 >
                   <EyeIcon className="h-4 w-4 inline mr-1" />
                   View
                 </button>
                 <button
-                  onClick={() => openInventoryModal(job)}
+                  onClick={() => openJobDetail(job)}
                   className="text-green-600 hover:text-green-900 text-sm font-medium"
                 >
-                  <CubeIcon className="h-4 w-4 inline mr-1" />
                   Inventory
                 </button>
               </div>
@@ -399,170 +414,6 @@ export default function Jobs() {
         ))}
       </div>
 
-      {/* Job Details Modal */}
-      {isModalOpen && selectedJob && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-medium text-gray-900">Job Details</h3>
-                  <button onClick={closeModal} className="text-gray-400 hover:text-gray-500">
-                    <span className="sr-only">Close</span>
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Job Information</h4>
-                      <dl className="space-y-2 text-sm">
-                        <div>
-                          <dt className="text-gray-600">Job ID:</dt>
-                          <dd className="font-medium">{selectedJob.id}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-gray-600">Customer:</dt>
-                          <dd className="font-medium">{selectedJob.customerName}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-gray-600">Assigned To:</dt>
-                          <dd className="font-medium">{selectedJob.assignedTo}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-gray-600">Value:</dt>
-                          <dd className="font-medium">${selectedJob.value.toLocaleString()}</dd>
-                        </div>
-                      </dl>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Timeline</h4>
-                      <dl className="space-y-2 text-sm">
-                        <div>
-                          <dt className="text-gray-600">Start Date:</dt>
-                          <dd className="font-medium">{selectedJob.startDate}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-gray-600">Expected End:</dt>
-                          <dd className="font-medium">{selectedJob.expectedEndDate}</dd>
-                        </div>
-                        {selectedJob.actualEndDate && (
-                          <div>
-                            <dt className="text-gray-600">Actual End:</dt>
-                            <dd className="font-medium">{selectedJob.actualEndDate}</dd>
-                          </div>
-                        )}
-                        <div>
-                          <dt className="text-gray-600">Hours Logged:</dt>
-                          <dd className="font-medium">{selectedJob.hoursLogged} / {selectedJob.estimatedHours}</dd>
-                        </div>
-                      </dl>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                    <p className="text-sm text-gray-700">{selectedJob.description}</p>
-                  </div>
-
-                  {selectedJob.notes && (
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Notes</h4>
-                      <p className="text-sm text-gray-700">{selectedJob.notes}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Inventory Modal */}
-      {isInventoryModalOpen && selectedJob && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-medium text-gray-900">Inventory Management - {selectedJob.id}</h3>
-                  <button onClick={closeModal} className="text-gray-400 hover:text-gray-500">
-                    <span className="sr-only">Close</span>
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Item
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Reserved
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Consumed
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Remaining
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {selectedJob.inventoryReserved.map((item) => (
-                        <tr key={item.sku}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                              <div className="text-sm text-gray-500">{item.sku}</div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {item.reserved}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <input
-                              type="number"
-                              min="0"
-                              max={item.reserved}
-                              value={item.consumed}
-                              onChange={(e) => updateInventoryConsumption(selectedJob.id, item.sku, parseInt(e.target.value) || 0)}
-                              className="block w-20 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {item.reserved - item.consumed}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button className="text-blue-600 hover:text-blue-900 mr-3">
-                              Release
-                            </button>
-                            <button className="text-green-600 hover:text-green-900">
-                              Consume All
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

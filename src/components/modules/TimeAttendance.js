@@ -300,7 +300,7 @@ export default function TimeAttendance() {
                   <CalendarIcon className="h-8 w-8 text-orange-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Today's Hours</p>
+                  <p className="text-sm font-medium text-gray-600">Today&apos;s Hours</p>
                   <p className="text-2xl font-bold text-gray-900">{totalHoursToday}</p>
                 </div>
               </div>

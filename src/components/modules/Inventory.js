@@ -14,6 +14,7 @@ import {
   TruckIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+import InventoryDetail from '../details/InventoryDetail';
 
 const mockInventoryItems = [
   {
@@ -124,6 +125,7 @@ export default function Inventory() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMovementModalOpen, setIsMovementModalOpen] = useState(false);
   const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     sku: '',
@@ -206,12 +208,28 @@ export default function Inventory() {
     setIsMovementModalOpen(true);
   };
 
+  const openInventoryDetail = (item) => {
+    setSelectedItem(item);
+    setShowDetail(true);
+  };
+
+  const closeInventoryDetail = () => {
+    setShowDetail(false);
+    setSelectedItem(null);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setIsMovementModalOpen(false);
     setIsBulkImportOpen(false);
     setSelectedItem(null);
     setIsEditing(false);
+  };
+
+  const handleInventoryUpdate = (updatedItem) => {
+    setInventory(inventory.map(item => 
+      item.id === updatedItem.id ? updatedItem : item
+    ));
   };
 
   const handleSubmit = (e) => {
@@ -265,7 +283,7 @@ export default function Inventory() {
   };
 
   const handleDelete = (itemId) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
+    if (confirm('Are you sure you want to delete this item?')) {
       setInventory(inventory.filter(item => item.id !== itemId));
     }
   };
@@ -278,6 +296,17 @@ export default function Inventory() {
     }
     return { label: 'Normal', color: 'bg-green-100 text-green-800' };
   };
+
+  // Show detail view if an item is selected
+  if (showDetail && selectedItem) {
+    return (
+      <InventoryDetail 
+        item={selectedItem} 
+        onBack={closeInventoryDetail}
+        onUpdate={handleInventoryUpdate}
+      />
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -439,7 +468,12 @@ export default function Inventory() {
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                      <div 
+                        className="text-sm font-medium text-gray-900 cursor-pointer hover:text-blue-600"
+                        onClick={() => openInventoryDetail(item)}
+                      >
+                        {item.name}
+                      </div>
                       <div className="text-sm text-gray-500">{item.sku} • {item.category}</div>
                       <div className="text-xs text-gray-400">{item.location}</div>
                     </div>

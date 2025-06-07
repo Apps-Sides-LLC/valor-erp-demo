@@ -8,6 +8,7 @@ export function UIProvider({ children }) {
   const [activeSection, setActiveSection] = useState('Dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [shouldOpenEstimateModal, setShouldOpenEstimateModal] = useState(false);
 
   const value = useMemo(
     () => ({
@@ -17,8 +18,10 @@ export function UIProvider({ children }) {
       setSidebarCollapsed,
       mobileMenuOpen,
       setMobileMenuOpen,
+      shouldOpenEstimateModal,
+      setShouldOpenEstimateModal,
     }),
-    [activeSection, sidebarCollapsed, mobileMenuOpen]
+    [activeSection, sidebarCollapsed, mobileMenuOpen, shouldOpenEstimateModal]
   );
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

@@ -10,6 +10,7 @@ import {
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
 } from "@heroicons/react/24/outline";
+import { useUI } from '@/context/ui-context';
 
 const stats = [
   {
@@ -91,6 +92,13 @@ const statusColors = {
 };
 
 export default function Dashboard() {
+  const { setActiveSection, setShouldOpenEstimateModal } = useUI();
+
+  const handleNewEstimate = () => {
+    setShouldOpenEstimateModal(true);
+    setActiveSection('Estimates');
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
@@ -135,6 +143,42 @@ export default function Dashboard() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mb-8 bg-white rounded-xl shadow-sm ring-1 ring-gray-900/5 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Quick Actions
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <button 
+            onClick={handleNewEstimate}
+            className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+          >
+            <CurrencyDollarIcon className="h-8 w-8 text-blue-600 mb-2" />
+            <span className="text-sm font-medium text-gray-900">
+              New Estimate
+            </span>
+          </button>
+          <button className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
+            <UsersIcon className="h-8 w-8 text-blue-600 mb-2" />
+            <span className="text-sm font-medium text-gray-900">
+              Add Customer
+            </span>
+          </button>
+          <button className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
+            <BriefcaseIcon className="h-8 w-8 text-blue-600 mb-2" />
+            <span className="text-sm font-medium text-gray-900">
+              Create Job
+            </span>
+          </button>
+          <button className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
+            <CurrencyDollarIcon className="h-8 w-8 text-blue-600 mb-2" />
+            <span className="text-sm font-medium text-gray-900">
+              New Invoice
+            </span>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -227,39 +271,6 @@ export default function Dashboard() {
               </button>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="mt-8 bg-white rounded-xl shadow-sm ring-1 ring-gray-900/5 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Quick Actions
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <button className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
-            <UsersIcon className="h-8 w-8 text-blue-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">
-              Add Customer
-            </span>
-          </button>
-          <button className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
-            <BriefcaseIcon className="h-8 w-8 text-blue-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">
-              Create Job
-            </span>
-          </button>
-          <button className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
-            <CurrencyDollarIcon className="h-8 w-8 text-blue-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">
-              New Invoice
-            </span>
-          </button>
-          <button className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
-            <ChartBarIcon className="h-8 w-8 text-blue-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">
-              View Reports
-            </span>
-          </button>
         </div>
       </div>
     </div>

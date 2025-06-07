@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   MagnifyingGlassIcon,
   PlusIcon,
@@ -8,11 +8,15 @@ import {
   TrashIcon,
   EyeIcon,
   PaperAirplaneIcon,
+  DocumentDuplicateIcon,
   DocumentArrowDownIcon,
   XMarkIcon,
   CalendarIcon,
   CurrencyDollarIcon,
+  UserIcon,
 } from '@heroicons/react/24/outline';
+import EstimateDetail from '../details/EstimateDetail';
+import { useUI } from '@/context/ui-context';
 
 const mockEstimates = [
   {
@@ -92,11 +96,12 @@ const mockCustomers = [
 ];
 
 export default function Estimates() {
+  const { setActiveSection, shouldOpenEstimateModal, setShouldOpenEstimateModal } = useUI();
   const [estimates, setEstimates] = useState(mockEstimates);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEstimate, setSelectedEstimate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     customerId: '',
@@ -112,6 +117,24 @@ export default function Estimates() {
     estimate.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     estimate.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Check if we should open the modal from external trigger (e.g., Dashboard)
+  useEffect(() => {
+    if (shouldOpenEstimateModal) {
+      setFormData({
+        customerId: '',
+        customerName: '',
+        title: '',
+        description: '',
+        validUntil: '',
+        items: [{ id: 1, description: '', quantity: 1, unit: 'ea', unitPrice: 0, total: 0 }],
+      });
+      setIsEditing(false);
+      setSelectedEstimate(null);
+      setIsModalOpen(true);
+      setShouldOpenEstimateModal(false);
+    }
+  }, [shouldOpenEstimateModal, setShouldOpenEstimateModal]);
 
   const calculateTotals = (items) => {
     const subtotal = items.reduce((sum, item) => sum + item.total, 0);
@@ -147,16 +170,37 @@ export default function Estimates() {
     setIsModalOpen(true);
   };
 
-  const openViewModal = (estimate) => {
+  const openEstimateDetail = (estimate) => {
     setSelectedEstimate(estimate);
-    setIsViewModalOpen(true);
+    setShowDetail(true);
+  };
+
+  const closeEstimateDetail = () => {
+    setShowDetail(false);
+    setSelectedEstimate(null);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setIsViewModalOpen(false);
     setSelectedEstimate(null);
     setIsEditing(false);
+  };
+
+  const handleEstimateUpdate = (updatedEstimate) => {
+    setEstimates(estimates.map(estimate => 
+      estimate.id === updatedEstimate.id ? updatedEstimate : estimate
+    ));
+  };
+
+  const handleCreateJob = (estimate) => {
+    // In a real application, this would create a new job from the estimate
+    console.log('Creating job from estimate:', estimate);
+    
+    // Navigate to Jobs section
+    setActiveSection('Jobs');
+    
+    // Close the detail view
+    closeEstimateDetail();
   };
 
   const addItem = () => {
@@ -235,6 +279,18 @@ export default function Estimates() {
       setEstimates(estimates.filter(estimate => estimate.id !== estimateId));
     }
   };
+
+  // Show detail view if an estimate is selected
+  if (showDetail && selectedEstimate) {
+    return (
+      <EstimateDetail 
+        estimate={selectedEstimate} 
+        onBack={closeEstimateDetail}
+        onUpdate={handleEstimateUpdate}
+        onCreateJob={handleCreateJob}
+      />
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -326,7 +382,10 @@ export default function Estimates() {
                     <div className="text-sm font-medium text-gray-900">
                       {estimate.id}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div 
+                      className="text-sm text-gray-500 cursor-pointer hover:text-blue-600"
+                      onClick={() => openEstimateDetail(estimate)}
+                    >
                       {estimate.title}
                     </div>
                   </div>
@@ -348,7 +407,7 @@ export default function Estimates() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => openViewModal(estimate)}
+                      onClick={() => openEstimateDetail(estimate)}
                       className="text-gray-600 hover:text-gray-900"
                       title="View"
                     >
@@ -395,9 +454,9 @@ export default function Estimates() {
       {/* Create/Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={closeModal}></div>
+            <div className="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all max-w-4xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
               <form onSubmit={handleSubmit}>
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="flex items-center justify-between mb-6">
@@ -572,82 +631,7 @@ export default function Estimates() {
         </div>
       )}
 
-      {/* View Modal */}
-      {isViewModalOpen && selectedEstimate && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-medium text-gray-900">Estimate Preview</h3>
-                  <button type="button" onClick={closeModal} className="text-gray-400 hover:text-gray-500">
-                    <XMarkIcon className="h-6 w-6" />
-                  </button>
-                </div>
-                <div className="bg-white p-8 border border-gray-200 rounded-lg">
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedEstimate.id}</h2>
-                    <h3 className="text-xl text-gray-700">{selectedEstimate.title}</h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-8 mb-8">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Customer:</h4>
-                      <p className="text-gray-700">{selectedEstimate.customerName}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">Valid Until:</h4>
-                      <p className="text-gray-700">{selectedEstimate.validUntil}</p>
-                    </div>
-                  </div>
-                  <div className="mb-8">
-                    <h4 className="font-semibold text-gray-900 mb-2">Description:</h4>
-                    <p className="text-gray-700">{selectedEstimate.description}</p>
-                  </div>
-                  <table className="w-full mb-8">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-2">Description</th>
-                        <th className="text-right py-2">Qty</th>
-                        <th className="text-right py-2">Unit</th>
-                        <th className="text-right py-2">Price</th>
-                        <th className="text-right py-2">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedEstimate.items.map((item) => (
-                        <tr key={item.id} className="border-b border-gray-100">
-                          <td className="py-2">{item.description}</td>
-                          <td className="text-right py-2">{item.quantity}</td>
-                          <td className="text-right py-2">{item.unit}</td>
-                          <td className="text-right py-2">${item.unitPrice.toFixed(2)}</td>
-                          <td className="text-right py-2">${item.total.toFixed(2)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <div className="flex justify-end">
-                    <div className="w-64">
-                      <div className="flex justify-between mb-2">
-                        <span>Subtotal:</span>
-                        <span>${selectedEstimate.total.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between mb-2">
-                        <span>Tax:</span>
-                        <span>${selectedEstimate.tax.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-lg font-bold border-t border-gray-200 pt-2">
-                        <span>Total:</span>
-                        <span>${selectedEstimate.grandTotal.toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

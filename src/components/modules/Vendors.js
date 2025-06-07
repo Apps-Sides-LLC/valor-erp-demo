@@ -15,6 +15,7 @@ import {
   CurrencyDollarIcon,
   DocumentTextIcon,
 } from '@heroicons/react/24/outline';
+import VendorDetail from '../details/VendorDetail';
 
 const mockVendors = [
   {
@@ -146,6 +147,7 @@ export default function Vendors() {
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('vendors');
   const [formData, setFormData] = useState({
@@ -216,11 +218,27 @@ export default function Vendors() {
     setIsViewModalOpen(true);
   };
 
+  const openVendorDetail = (vendor) => {
+    setSelectedVendor(vendor);
+    setShowDetail(true);
+  };
+
+  const closeVendorDetail = () => {
+    setShowDetail(false);
+    setSelectedVendor(null);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setIsViewModalOpen(false);
     setSelectedVendor(null);
     setIsEditing(false);
+  };
+
+  const handleVendorUpdate = (updatedVendor) => {
+    setVendors(vendors.map(vendor => 
+      vendor.id === updatedVendor.id ? updatedVendor : vendor
+    ));
   };
 
   const handleSubmit = (e) => {
@@ -249,10 +267,21 @@ export default function Vendors() {
   };
 
   const handleDelete = (vendorId) => {
-    if (window.confirm('Are you sure you want to delete this vendor?')) {
+    if (confirm('Are you sure you want to delete this vendor?')) {
       setVendors(vendors.filter(vendor => vendor.id !== vendorId));
     }
   };
+
+  // Show detail view if a vendor is selected
+  if (showDetail && selectedVendor) {
+    return (
+      <VendorDetail 
+        vendor={selectedVendor} 
+        onBack={closeVendorDetail}
+        onUpdate={handleVendorUpdate}
+      />
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -415,7 +444,12 @@ export default function Vendors() {
                   <tr key={vendor.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{vendor.name}</div>
+                        <div 
+                          className="text-sm font-medium text-gray-900 cursor-pointer hover:text-blue-600"
+                          onClick={() => openVendorDetail(vendor)}
+                        >
+                          {vendor.name}
+                        </div>
                         <div className="text-sm text-gray-500 flex items-center mt-1">
                           <MapPinIcon className="h-4 w-4 mr-1" />
                           {vendor.address}
