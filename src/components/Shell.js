@@ -28,6 +28,7 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { useUI } from "@/context/ui-context";
+import { usePathname } from "next/navigation";
 
 const navigation = [
   { name: "Dashboard", icon: HomeIcon, href: "/dashboard" },
@@ -53,16 +54,28 @@ function classNames(...classes) {
 
 function SidebarContent() {
   const { activeSection, setActiveSection } = useUI();
+  const pathname = usePathname();
+
+  // Extract the first segment of the path, e.g., "/test" => "test"
+  const pathSegment = pathname.split("/")[1] || "";
+  // Capitalize and append "ERP" if path segment exists, else default
+  // I want plus signs in the path to become spaces.
+  const sidebarTitle = pathSegment
+    ? `${pathSegment.replace(/\+/g, " ").charAt(0).toUpperCase() + pathSegment.replace(/\+/g, " ").slice(1)} ERP`
+    : "ERP";
+  const firstLetter = sidebarTitle.charAt(0).toUpperCase();
 
   return (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex h-16 shrink-0 items-center px-6">
+      <div className="flex mt-6 h-16 shrink-0 items-center px-6">
         <div className="flex items-center">
           <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
-            <span className="text-white font-bold text-lg">V</span>
+            <span className="text-white font-bold text-lg">{firstLetter}</span>
           </div>
-          <span className="ml-3 text-xl font-bold text-white">Valor ERP</span>
+          <span className="ml-3 text-xl font-bold text-white">
+            {sidebarTitle}
+          </span>
         </div>
       </div>
 
