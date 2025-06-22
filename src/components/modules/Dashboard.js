@@ -10,7 +10,8 @@ import {
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
 } from "@heroicons/react/24/outline";
-import { useUI } from '@/context/ui-context';
+import { useUI } from "@/context/ui-context";
+import { usePathname } from "next/navigation";
 
 const stats = [
   {
@@ -96,14 +97,20 @@ export default function Dashboard() {
 
   const handleNewEstimate = () => {
     setShouldOpenEstimateModal(true);
-    setActiveSection('Estimates');
+    setActiveSection("Estimates");
   };
+
+  const pathname = usePathname();
+  const decodedPathname = decodeURIComponent(pathname.replace("/", ""));
+  const pageTitle = decodedPathname
+    ? `Dashboard for ${decodedPathname}`
+    : "Dashboard";
 
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
         <p className="mt-2 text-lg text-gray-600">
           Overview of your business operations and key metrics
         </p>
@@ -151,7 +158,7 @@ export default function Dashboard() {
           Quick Actions
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <button 
+          <button
             onClick={handleNewEstimate}
             className="flex flex-col items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
           >
