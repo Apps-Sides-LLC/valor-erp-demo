@@ -53,7 +53,7 @@ function classNames(...classes) {
 }
 
 function SidebarContent() {
-  const { activeSection, setActiveSection } = useUI();
+  const { activeSection, setActiveSection, setMobileMenuOpen } = useUI();
 
   return (
     <div className="flex h-full flex-col">
@@ -73,7 +73,10 @@ function SidebarContent() {
           {navigation.map((item) => (
             <li key={item.name}>
               <button
-                onClick={() => setActiveSection(item.name)}
+                onClick={() => {
+                  setActiveSection(item.name);
+                  setMobileMenuOpen(false);
+                }}
                 className={classNames(
                   activeSection === item.name
                     ? "bg-blue-600 text-white shadow-sm"
